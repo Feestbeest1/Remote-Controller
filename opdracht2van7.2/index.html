@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>WebSocket Client</title>
+</head>
+
+<body>
+    <input type="text" id="messageInput">
+    <button id="sendButton">Send</button>
+    <button id="pingButton">Ping</button>
+    <ul id="messages"></ul>
+
+    <script>
+        const pingButton = document.getElementById('pingButton');
+        const socket = new WebSocket('ws://localhost:8080');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+        const messages = document.getElementById('messages');
+
+        pingButton.addEventListener('click', () => {
+            socket.send("PING");
+        });
+
+        socket.addEventListener('message', event => {
+            if (event.data == "PING") {
+                // geluid afspelen
+                const audio = new Audio('https://www.soundjay.com/buttons/beep-01a.mp3');
+                audio.play();
+
+                const message = document.createElement('li');
+                message.textContent = "🔔 Je bent gepingd!";
+                messages.appendChild(message);
+            } else {
+                const message = document.createElement('li');
+                message.textContent = event.data;
+                messages.appendChild(message);
+            }
+        });
+        sendButton.addEventListener('click', () => {
+            const message = messageInput.value;
+            if (!message) return;
+            socket.send("ME: " + message); // voeg label ME toe voor je eigen berichten
+            messageInput.value = '';
+        });
+    </script>
+</body>
+
+</html>
